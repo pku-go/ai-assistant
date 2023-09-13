@@ -31,11 +31,6 @@ def add_text(history, text):
         "content": history[-1][0]
     }
     messages.append(new_message)
-    new_message = {
-        "role": "user",
-        "content": history[-1][0]
-    }
-    messages.append(new_message)
     return history, gr.update(value="", interactive=False)
 
 
@@ -46,6 +41,7 @@ def add_file(history, file):
             "role": "user",
             "content": audio2text(file)
         }
+        messages.append(new_message)
     elif file.name.endswith((".png")):
         '''
         TODO
@@ -56,14 +52,13 @@ def add_file(history, file):
         TODO
         '''
         pass
-    messages.append(new_message)
     return history
 
 
 def bot(history):
     if type(history[-1][0]) == str:
         '''
-        TODO refresh history[-1][1]
+        TODO refresh history[-1][1] and messages
         '''
         if history[-1][0].startswith(("/search")):
             pass
@@ -90,6 +85,12 @@ def bot(history):
             for new_history in get_chatResponse(messages):
                 history[-1][1] = new_history
                 yield history
+            new_message = {
+                "role": "assistant",
+                "content": history[-1][1]
+            }
+            messages.append(new_message)
+            print(messages)
     elif type(history[-1][0]) == tuple:
         if history[-1][0][0].endswith((".wav")):
             for new_history in get_chatResponse(messages):
@@ -102,11 +103,7 @@ def bot(history):
             pass
         elif history[-1][0][0].endswith((".txt")):
             pass
-    new_message = {
-        "role": "assistant",
-        "content": history[-1][1]
-    }
-    messages.append(new_message)
+
     return history
 
 
