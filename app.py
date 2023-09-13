@@ -26,11 +26,27 @@ def get_chatResponse(messages):
 
 def add_text(history, text):
     history = history + [(text, None)]
-    new_message = {
-        "role": "user",
-        "content": history[-1][0]
-    }
-    messages.append(new_message)
+    if text.startswith("/search"):
+        pass
+    elif text.startswith("/fetch"):
+        pass
+    elif text.startswith("/file"):
+        content = text[6:]
+        file_name = history[-2][0][0]
+        print(file_name)
+        with open(file_name, 'r', encoding="utf-8") as f:
+            current_file_text = f.read()
+        new_message = {
+            "role": "user",
+            "content": generate_answer(current_file_text, content)
+        }
+        messages.append(new_message)
+    else:
+        new_message = {
+            "role": "user",
+            "content": history[-1][0]
+        }
+        messages.append(new_message)
     return history, gr.update(value="", interactive=False)
 
 
@@ -43,15 +59,19 @@ def add_file(history, file):
         }
         messages.append(new_message)
     elif file.name.endswith((".png")):
-        '''
-        TODO
-        '''
-        pass
+        new_message = {
+            "role": "user",
+            "content": f"Please classify {file.name}"
+        }
+        messages.append(new_message)
     elif file.name.endswith((".txt")):
-        '''
-        TODO
-        '''
-        pass
+        with open(file.name, 'r', encoding="utf-8") as f:
+            current_file_text = f.read()
+        new_message = {
+            "role": "user",
+            "content": generate_summary(current_file_text)
+        }
+        messages.append(new_message)
     return history
 
 
@@ -92,6 +112,7 @@ def bot(history):
             yield history
 
         elif history[-1][0].startswith(("/file")):
+            content = history[-1][0][6:]
             pass
 
         elif history[-1][0].startswith(("/function")):
@@ -115,14 +136,26 @@ def bot(history):
                 yield history
 
         elif history[-1][0][0].endswith((".png")):
-            '''
-            TODO refresh history[-1][1] and message
-            '''
-
-            pass
-
+            new_message = {
+                "role": "assistant",
+                "content": image_classification(history[-1][0][0])
+            }
+            messages.append(new_message)
+            history[-1][1] = new_message['content']
+            yield history
         elif history[-1][0][0].endswith((".txt")):
-            pass
+            history[-1][1] = ""
+            for chunk in generate_text(messages[-1]['content']):
+                try:
+                    history[-1][1] += chunk['choices'][0]['text']
+                    yield history
+                except KeyError:
+                    pass
+            new_message = {
+                "role": "assistant",
+                "content": history[-1][1]
+            }
+            messages.append(new_message)
 
     return history
 
