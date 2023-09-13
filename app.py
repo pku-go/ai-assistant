@@ -53,7 +53,6 @@ def add_file(history, file):
 
 
 def bot(history):
-    print(history)
     if type(history[-1][0]) == str:
         '''
         TODO refresh history[-1][1]
