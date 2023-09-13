@@ -2,6 +2,7 @@ import gradio as gr
 import os
 import time
 from chat import *
+from stt import *
 
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 
@@ -9,29 +10,81 @@ messages = []
 current_file_text = None
 
 
+def get_chatResponse(messages):
+    response = chat(messages)
+    results = ""
+    for chunk in response:
+        try:
+            results += chunk['choices'][0]['delta']['content']
+            yield results
+        except KeyError:
+            pass
+
+
 def add_text(history, text):
     history = history + [(text, None)]
-    return history, gr.update(value="", interactive=False)
-
-
-def add_file(history, file):
-    history = history + [((file.name,), None)]
-    return history
-
-
-def bot(history):
     new_message = {
         "role": "user",
         "content": history[-1][0]
     }
     messages.append(new_message)
-    response = chat(messages)
-    history[-1][1] = ""
-    for chunk in response:
-        try:
-            history[-1][1] += chunk['choices'][0]['delta']['content']
-            yield history
-        except KeyError:
+    return history, gr.update(value="", interactive=False)
+
+
+def add_file(history, file):
+    history = history + [((file.name,), None)]
+    if file.name.endswith((".wav")):
+        new_message = {
+            "role": "user",
+            "content": audio2text(file)
+        }
+    elif file.name.endswith((".png")):
+        '''
+        TODO
+        '''
+        pass
+    elif file.name.endswith((".txt")):
+        '''
+        TODO
+        '''
+        pass
+    messages.append(new_message)
+    return history
+
+
+def bot(history):
+    print(history)
+    if type(history[-1][0]) == str:
+        '''
+        TODO refresh history[-1][1]
+        '''
+        if history[-1][0].startswith(("/search")):
+            pass
+        elif history[-1][0].startswith(("/fetch")):
+            pass
+        elif history[-1][0].startswith(("/image")):
+            pass
+        elif history[-1][0].startswith(("/audio")):
+            pass
+        elif history[-1][0].startswith(("/file")):
+            pass
+        elif history[-1][0].startswith(("/function")):
+            pass
+        else:
+            for new_history in get_chatResponse(messages):
+                history[-1][1] = new_history
+                yield history
+    elif type(history[-1][0]) == tuple:
+        if history[-1][0][0].endswith((".wav")):
+            for new_history in get_chatResponse(messages):
+                history[-1][1] = new_history
+                yield history
+        elif history[-1][0][0].endswith((".png")):
+            '''
+            TODO refresh history[-1][1]
+            '''
+            pass
+        elif history[-1][0][0].endswith((".txt")):
             pass
     new_message = {
         "role": "assistant",

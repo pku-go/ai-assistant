@@ -1,11 +1,15 @@
 import requests
 
 def audio2text(file):
-    """
-    TODO
-    """
-    pass
+    url = 'http://localhost:8080/v1/audio/transcriptions'
+    files = {
+        'file': open(file.name, 'rb'),
+        'model': (None, 'whisper-1')
+    }
+
+    response = requests.post(url=url, files=files)
+    return response.json()['text']
 
 
-if __name__ == "__main__":
-    audio2text('sun-wukong.wav')
+# if __name__ == "__main__":
+#     audio2text('sun-wukong.wav')
