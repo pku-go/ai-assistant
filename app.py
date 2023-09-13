@@ -3,7 +3,7 @@ import os
 import time
 from chat import *
 from stt import *
-
+from image_generate import *
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 
 messages = []
@@ -62,7 +62,16 @@ def bot(history):
         elif history[-1][0].startswith(("/fetch")):
             pass
         elif history[-1][0].startswith(("/image")):
-            pass
+            content = history[-1][0][7:]
+            url = image_generate(content)
+            new_message = {
+                "role": "assistant",
+                "content": url
+            }
+            messages.append(new_message)
+            history[-1][1] = (url,)
+            yield history
+
         elif history[-1][0].startswith(("/audio")):
             pass
         elif history[-1][0].startswith(("/file")):
