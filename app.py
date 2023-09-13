@@ -43,8 +43,8 @@ def add_text(history, text):
         content = text[6:]
         file_name = history[-2][0][0]
         with open(file_name, 'r', encoding="utf-8") as f:
-            # current_file_text = f.read()
-            current_file_text = f.read().replace('\n', ' ')
+            current_file_text = f.read()
+            # current_file_text = f.read().replace('\n', ' ')
         new_message = {
             "role": "user",
             "content": generate_answer(current_file_text, content)
@@ -75,8 +75,8 @@ def add_file(history, file):
         messages.append(new_message)
     elif file.name.endswith((".txt")):
         with open(file.name, 'r', encoding="utf-8") as f:
-            # current_file_text = f.read()
-            current_file_text = f.read().replace('\n', ' ')
+            current_file_text = f.read()
+            # current_file_text = f.read().replace('\n', ' ')
         new_message = {
             "role": "user",
             "content": generate_summary(current_file_text)
