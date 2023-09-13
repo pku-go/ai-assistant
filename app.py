@@ -3,6 +3,8 @@ import os
 import time
 from chat import *
 
+from mnist import *
+
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 
 messages = []
@@ -11,6 +13,11 @@ current_file_text = None
 
 def add_text(history, text):
     history = history + [(text, None)]
+    new_message = {
+        "role": "user",
+        "content": history[-1][0]
+    }
+    messages.append(new_message)
     return history, gr.update(value="", interactive=False)
 
 
@@ -20,11 +27,6 @@ def add_file(history, file):
 
 
 def bot(history):
-    new_message = {
-        "role": "user",
-        "content": history[-1][0]
-    }
-    messages.append(new_message)
     response = chat(messages)
     history[-1][1] = ""
     for chunk in response:
