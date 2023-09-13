@@ -2,6 +2,9 @@ import gradio as gr
 import os
 import time
 from chat import *
+
+from mnist import *
+from pdf import *
 from stt import *
 from image_generate import *
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
@@ -23,6 +26,11 @@ def get_chatResponse(messages):
 
 def add_text(history, text):
     history = history + [(text, None)]
+    new_message = {
+        "role": "user",
+        "content": history[-1][0]
+    }
+    messages.append(new_message)
     new_message = {
         "role": "user",
         "content": history[-1][0]
