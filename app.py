@@ -1,6 +1,5 @@
 import gradio as gr
 import os
-import time
 from chat import *
 
 from mnist import *
@@ -90,7 +89,6 @@ def bot(history):
                 "content": history[-1][1]
             }
             messages.append(new_message)
-            print(messages)
     elif type(history[-1][0]) == tuple:
         if history[-1][0][0].endswith((".wav")):
             for new_history in get_chatResponse(messages):
