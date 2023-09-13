@@ -1,15 +1,4 @@
-#!/usr/bin/python3
-
-"""
-# -*- coding: utf-8 -*-
-
-# @Time     : 2020/8/28 11:04
-# @File     : lenet.py
-
-"""
-
 import torch
-
 
 class LeNet(torch.nn.Module):
     def __init__(self, num_classes=10):
