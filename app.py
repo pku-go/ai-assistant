@@ -2,8 +2,11 @@ import gradio as gr
 import os
 import time
 from chat import *
-from stt import *
 
+from mnist import *
+from pdf import *
+from stt import *
+from image_generate import *
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 
 messages = []
@@ -23,6 +26,11 @@ def get_chatResponse(messages):
 
 def add_text(history, text):
     history = history + [(text, None)]
+    new_message = {
+        "role": "user",
+        "content": history[-1][0]
+    }
+    messages.append(new_message)
     new_message = {
         "role": "user",
         "content": history[-1][0]
@@ -62,7 +70,16 @@ def bot(history):
         elif history[-1][0].startswith(("/fetch")):
             pass
         elif history[-1][0].startswith(("/image")):
-            pass
+            content = history[-1][0][7:]
+            url = image_generate(content)
+            new_message = {
+                "role": "assistant",
+                "content": url
+            }
+            messages.append(new_message)
+            history[-1][1] = (url,)
+            yield history
+
         elif history[-1][0].startswith(("/audio")):
             pass
         elif history[-1][0].startswith(("/file")):
@@ -112,13 +129,11 @@ with gr.Blocks() as demo:
         btn = gr.UploadButton(
             "📁", file_types=["image", "video", "audio", "text"])
 
-    txt_msg = txt.submit(add_text, [chatbot, txt], [chatbot, txt], queue=False).then(
-        bot, chatbot, chatbot
-    )
+    txt_msg = txt.submit(add_text, [chatbot, txt], [chatbot, txt],
+                         queue=False).then(bot, chatbot, chatbot)
     txt_msg.then(lambda: gr.update(interactive=True), None, [txt], queue=False)
-    file_msg = btn.upload(add_file, [chatbot, btn], [chatbot], queue=False).then(
-        bot, chatbot, chatbot
-    )
+    file_msg = btn.upload(add_file, [chatbot, btn], [chatbot],
+                          queue=False).then(bot, chatbot, chatbot)
     clear_btn.click(lambda: messages.clear(), None, chatbot, queue=False)
 
 demo.queue()
