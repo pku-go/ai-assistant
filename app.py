@@ -23,8 +23,17 @@ def bot(history):
     new_message = {"role": "user", "content": history[-1][0]}
     messages.append(new_message)
     response = chat(messages)
-    history[-1][1] = response
-    new_message = {"role": "assistant", "content": response}
+    history[-1][1] = ""
+    for chunk in response:
+        try:
+            history[-1][1] += chunk['choices'][0]['delta']['content']
+            yield history
+        except KeyError:
+            pass
+    new_message = {
+        "role": "assistant",
+        "content": history[-1][1]
+    }
     messages.append(new_message)
     return history
 
@@ -33,8 +42,8 @@ with gr.Blocks() as demo:
     chatbot = gr.Chatbot(
         [],
         elem_id="chatbot",
-        avatar_images=(None, (os.path.join(os.path.dirname(__file__),
-                                           "avatar.png"))),
+        avatar_images=(
+            None, (os.path.join(os.path.dirname(__file__), "avatar.png"))),
     )
 
     with gr.Row():
@@ -45,8 +54,8 @@ with gr.Blocks() as demo:
             container=False,
         )
         clear_btn = gr.Button('Clear')
-        btn = gr.UploadButton("📁",
-                              file_types=["image", "video", "audio", "text"])
+        btn = gr.UploadButton(
+            "📁", file_types=["image", "video", "audio", "text"])
 
     txt_msg = txt.submit(add_text, [chatbot, txt], [chatbot, txt],
                          queue=False).then(bot, chatbot, chatbot)

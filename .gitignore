@@ -1,7 +1,8 @@
+__pycache__/
 avatar.png
 figures/
 LocalAI/
-minist.png
+mnist.png
 requirements.txt
 sample.txt
 setup.sh
