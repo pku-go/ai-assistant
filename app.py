@@ -5,6 +5,7 @@ from chat import *
 from mnist import *
 from pdf import *
 from stt import *
+from tts import *
 from image_generate import *
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 
@@ -61,8 +62,10 @@ def bot(history):
         '''
         if history[-1][0].startswith(("/search")):
             pass
+
         elif history[-1][0].startswith(("/fetch")):
             pass
+
         elif history[-1][0].startswith(("/image")):
             content = history[-1][0][7:]
             url = image_generate(content)
@@ -75,11 +78,25 @@ def bot(history):
             yield history
 
         elif history[-1][0].startswith(("/audio")):
-            pass
+            messages[-1]["content"] = messages[-1]["content"][7:]
+            for new_history in get_chatResponse(messages):
+                history[-1][1] = new_history
+            path = text2audio(history[-1][1])
+            messages[-1]["content"] = "/audio " + messages[-1]["content"]
+            new_message = {
+                "role": "assistant",
+                "content": history[-1][1]
+            }
+            messages.append(new_message)
+            history[-1][1] = (path,)
+            yield history
+
         elif history[-1][0].startswith(("/file")):
             pass
+
         elif history[-1][0].startswith(("/function")):
             pass
+
         else:
             for new_history in get_chatResponse(messages):
                 history[-1][1] = new_history
@@ -89,16 +106,21 @@ def bot(history):
                 "content": history[-1][1]
             }
             messages.append(new_message)
+
     elif type(history[-1][0]) == tuple:
+
         if history[-1][0][0].endswith((".wav")):
             for new_history in get_chatResponse(messages):
                 history[-1][1] = new_history
                 yield history
+
         elif history[-1][0][0].endswith((".png")):
             '''
-            TODO refresh history[-1][1]
+            TODO refresh history[-1][1] and message
             '''
+
             pass
+
         elif history[-1][0][0].endswith((".txt")):
             pass
 
