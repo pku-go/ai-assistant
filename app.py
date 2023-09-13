@@ -4,6 +4,7 @@ import time
 from chat import *
 
 from mnist import *
+from pdf import *
 
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 
