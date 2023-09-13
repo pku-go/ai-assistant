@@ -20,7 +20,10 @@ def add_file(history, file):
 
 
 def bot(history):
-    new_message = {"role": "user", "content": history[-1][0]}
+    new_message = {
+        "role": "user", 
+        "content": history[-1][0]
+    }
     messages.append(new_message)
     response = chat(messages)
     history[-1][1] = ""
