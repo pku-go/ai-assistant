@@ -1,6 +1,7 @@
 
 import requests
 from datetime import datetime
+import os
 
 def text2audio(content: str):
     url = 'http://localhost:8080/tts'
@@ -13,6 +14,8 @@ def text2audio(content: str):
     }
 
     audio_dir = "./audio"
+    if not os.path.exists(audio_dir):
+        os.makedirs(audio_dir)
     response = requests.post(url, headers=headers, json=json_data)
 
     current_time = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
