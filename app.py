@@ -1,14 +1,15 @@
 import gradio as gr
 import os
-from chat import *
-from search import search
-from fetch import fetch
 
-from mnist import *
-from pdf import *
+from chat import *
+from search import *
+from fetch import *
+from image_generate import *
 from stt import *
 from tts import *
-from image_generate import *
+from pdf import *
+
+from mnist import *
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 
 messages = []
@@ -37,6 +38,7 @@ def get_textResponse(prompt):
 
 def add_text(history, text):
     history = history + [(text, None)]
+
     if text.startswith("/search"):
         print("searching...")
         search_content = history[-1][0].replace("/search", "").strip()
@@ -46,6 +48,7 @@ def add_text(history, text):
             "content": search_result
         }
         messages.append(new_message)
+    
     elif text.startswith("/fetch"):
         print("fetching...")
         fetch_url = history[-1][0].replace("/fetch", "").strip()
@@ -55,6 +58,7 @@ def add_text(history, text):
             "content": fetch_result
         }
         messages.append(new_message)
+    
     elif text.startswith("/file"):
         content = text[6:]
         file_name = history[-2][0][0]
@@ -65,29 +69,34 @@ def add_text(history, text):
             "content": generate_answer(current_file_text, content)
         }
         messages.append(new_message)
+    
     else:
         new_message = {
             "role": "user",
             "content": history[-1][0]
         }
         messages.append(new_message)
+    
     return history, gr.update(value="", interactive=False)
 
 
 def add_file(history, file):
     history = history + [((file.name,), None)]
+
     if file.name.endswith((".wav")):
         new_message = {
             "role": "user",
             "content": audio2text(file)
         }
         messages.append(new_message)
+    
     elif file.name.endswith((".png")):
         new_message = {
             "role": "user",
             "content": f"Please classify {file.name}"
         }
         messages.append(new_message)
+    
     elif file.name.endswith((".txt")):
         with open(file.name, 'r', encoding="utf-8") as f:
             current_file_text = f.read().replace('\n', ' ')
@@ -96,16 +105,13 @@ def add_file(history, file):
             "content": generate_summary(current_file_text)
         }
         messages.append(new_message)
+    
     return history
 
 
 def bot(history):
     if type(history[-1][0]) == str:
-        '''
-        TODO refresh history[-1][1] and messages
-        '''
         if history[-1][0].startswith(("/search")):
-            
             for new_history in get_chatResponse(messages):
                 history[-1][1] = new_history
                 yield history
@@ -114,7 +120,6 @@ def bot(history):
                 "content": history[-1][1]
             }
             messages.append(new_message)
-            
 
         elif history[-1][0].startswith(("/fetch")):
             for new_history in get_chatResponse(messages):
@@ -150,6 +155,7 @@ def bot(history):
             messages.append(new_message)
             history[-1][1] = (path,)
             yield history
+
         elif history[-1][0].startswith(("/file")):
             question = messages[-1]["content"]
             for new_history in get_textResponse(question):
@@ -175,7 +181,6 @@ def bot(history):
             messages.append(new_message)
 
     elif type(history[-1][0]) == tuple:
-
         if history[-1][0][0].endswith((".wav")):
             for new_history in get_chatResponse(messages):
                 history[-1][1] = new_history
@@ -189,6 +194,7 @@ def bot(history):
             messages.append(new_message)
             history[-1][1] = new_message['content']
             yield history
+
         elif history[-1][0][0].endswith((".txt")):
             summary_prompt = messages[-1]['content']
             for new_history in get_textResponse(summary_prompt):
@@ -201,6 +207,7 @@ def bot(history):
                 "content": history[-1][1]
             }
             messages.append(new_message)
+
     return history
 
 
