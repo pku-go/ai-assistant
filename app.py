@@ -39,7 +39,7 @@ def add_text(history, text):
         messages.append(new_message)
     elif text.startswith("/fetch"):
         print("fetching...")
-        fetch_url = new_message["content"].replace("/fetch", "").strip()
+        fetch_url = history[-1][0].replace("/fetch", "").strip()
         fetch_result = fetch(fetch_url)
         new_message = {
             "role": "user",
