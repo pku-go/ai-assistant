@@ -1,6 +1,8 @@
 import gradio as gr
 import os
 from chat import *
+from search import search
+from fetch import fetch
 
 from mnist import *
 from pdf import *
@@ -27,9 +29,23 @@ def get_chatResponse(messages):
 def add_text(history, text):
     history = history + [(text, None)]
     if text.startswith("/search"):
-        pass
+        print("searching...")
+        search_content = history[-1][0].replace("/search", "").strip()
+        search_result = search(search_content)
+        new_message = {
+            "role": "user",
+            "content": search_result
+        }
+        messages.append(new_message)
     elif text.startswith("/fetch"):
-        pass
+        print("fetching...")
+        fetch_url = new_message["content"].replace("/fetch", "").strip()
+        fetch_result = fetch(fetch_url)
+        new_message = {
+            "role": "user",
+            "content": fetch_result
+        }
+        messages.append(new_message)
     elif text.startswith("/file"):
         content = text[6:]
         file_name = history[-2][0][0]
@@ -81,10 +97,26 @@ def bot(history):
         TODO refresh history[-1][1] and messages
         '''
         if history[-1][0].startswith(("/search")):
-            pass
+            
+            for new_history in get_chatResponse(messages):
+                history[-1][1] = new_history
+                yield history
+            new_message = {
+                "role": "assistant",
+                "content": history[-1][1]
+            }
+            messages.append(new_message)
+            
 
         elif history[-1][0].startswith(("/fetch")):
-            pass
+            for new_history in get_chatResponse(messages):
+                history[-1][1] = new_history
+                yield history
+            new_message = {
+                "role": "assistant",
+                "content": history[-1][1]
+            }
+            messages.append(new_message)
 
         elif history[-1][0].startswith(("/image")):
             content = history[-1][0][7:]
@@ -110,7 +142,6 @@ def bot(history):
             messages.append(new_message)
             history[-1][1] = (path,)
             yield history
-
         elif history[-1][0].startswith(("/file")):
             content = history[-1][0][6:]
             pass
@@ -156,7 +187,6 @@ def bot(history):
                 "content": history[-1][1]
             }
             messages.append(new_message)
-
     return history
 
 
