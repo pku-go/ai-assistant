@@ -2,6 +2,8 @@ import gradio as gr
 import os
 import time
 from chat import *
+from search import search
+from fetch import fetch
 
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 
@@ -21,7 +23,30 @@ def add_file(history, file):
 
 def bot(history):
     new_message = {"role": "user", "content": history[-1][0]}
-    messages.append(new_message)
+
+    if new_message["content"].startswith("/search"):
+        print("searching...")
+        search_content = new_message["content"].replace("/search", "").strip()
+        search_result = search(search_content)
+        new_message = {
+            "role": "user",
+            "content": search_result
+        }
+        messages.append(new_message)
+
+    elif new_message["content"].startswith("/fetch"):
+        print("fetching...")
+        fetch_url = new_message["content"].replace("/fetch", "").strip()
+        fetch_result = fetch(fetch_url)
+        new_message = {
+            "role": "user",
+            "content": fetch_result
+        }
+        messages.append(new_message)
+
+    else:
+        messages.append(new_message)
+
     response = chat(messages)
     history[-1][1] = ""
     for chunk in response:
@@ -35,6 +60,7 @@ def bot(history):
         "content": history[-1][1]
     }
     messages.append(new_message)
+
     return history
 
 

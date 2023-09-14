@@ -3,9 +3,7 @@ from bs4 import BeautifulSoup
 from serpapi import GoogleSearch
 
 def search(content: str):
-    """
-    TODO
-    """
+
     url = "https://serpapi.com/search"
 
     params = {
@@ -25,7 +23,8 @@ def search(content: str):
             snippet = search_results["organic_results"][0]["snippet"]
 
             question = f"Please answer {content} based on the search result: {snippet}"
-
+            
+            print(question)
             return question
         
         else:
@@ -36,4 +35,4 @@ def search(content: str):
 
 
 if __name__ == "__main__":
-    search("Sun Wukong")
+    search("Tsinghua University")
