@@ -1,11 +1,7 @@
-import os
 import requests
 from typing import List, Dict
 import openai
 import json
-openai.api_key = "sk-1234567890"
-openai.api_base = "http://166.111.80.169:8080/v1"
-
 
 def lookup_location_id(location: str):
     # 调用城市搜索API获取地理位置ID
@@ -20,6 +16,7 @@ def lookup_location_id(location: str):
     except Exception as e:
         print(f"Error looking up location ID: {e}")
         return None
+
 
 def get_current_weather(location: str):
     location_id = lookup_location_id(location)
@@ -50,7 +47,7 @@ todo_list = []
 
 def add_todo(todo):
     # 将TODO项添加到列表中
-    todo_list.append(todo)
+    todo_list.append("- " + todo)
     return "\n".join(todo_list)
 
 
@@ -86,26 +83,24 @@ functions = [
 
 
 def function_calling(messages):
+
+    openai.api_base = "http://localhost:8080/v1"
+    openai.api_key = "key-1234567890"
+
     response = openai.ChatCompletion.create(
         model="ggml-openllama.bin",
         messages=messages,
         functions=functions,
         function_call="auto",
     )
+
     function_call = response["choices"][0]["message"]["function_call"]
     function = function_call["function"]
     function_args = json.loads(function_call["arguments"])
     if function == "get_current_weather":
         location = function_args["location"]
         return get_current_weather(location)
+
     elif function == "add_todo":
         todo = function_args["todo"]
         return add_todo(todo)
-if __name__ == "__main__":
-    messages = [{"role": "user", "content": "What's the weather like in Beijing?"}]
-    response = function_calling(messages)
-    print(response)
-
-    messages = [{"role": "user", "content": "Add a todo: walk"}]
-    response = function_calling(messages)
-    print(response)

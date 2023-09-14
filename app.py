@@ -40,7 +40,6 @@ def add_text(history, text):
     history = history + [(text, None)]
 
     if text.startswith("/search"):
-        print("searching...")
         search_content = history[-1][0].replace("/search", "").strip()
         search_result = search(search_content)
         new_message = {
@@ -50,7 +49,6 @@ def add_text(history, text):
         messages.append(new_message)
     
     elif text.startswith("/fetch"):
-        print("fetching...")
         fetch_url = history[-1][0].replace("/fetch", "").strip()
         fetch_result = fetch(fetch_url)
         new_message = {
@@ -176,13 +174,14 @@ def bot(history):
 
         elif history[-1][0].startswith(("/function")):
             messages[-1]["content"] = messages[-1]["content"][10:]
-            history[-1][1]=function_calling(messages)
-            new_message={
+            history[-1][1] = function_calling(messages)
+            yield history
+            new_message = {
                 "role": "assistant",
                 "content": history[-1][1]
             }
             messages.append(new_message)
-            yield history
+            
         else:
             for new_history in get_chatResponse(messages):
                 history[-1][1] = new_history
@@ -213,8 +212,6 @@ def bot(history):
             for new_history in get_textResponse(summary_prompt):
                 history[-1][1] = new_history
                 yield history
-            if history[-1][1] == "":
-                print("history[-1][1] is null")
             new_message = {
                 "role": "assistant",
                 "content": history[-1][1]
