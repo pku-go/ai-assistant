@@ -175,8 +175,14 @@ def bot(history):
             messages.append(new_message)
 
         elif history[-1][0].startswith(("/function")):
-            pass
-
+            messages[-1]["content"] = messages[-1]["content"][10:]
+            history[-1][1]=function_calling(messages)
+            new_message={
+                "role": "assistant",
+                "content": history[-1][1]
+            }
+            messages.append(new_message)
+            yield history
         else:
             for new_history in get_chatResponse(messages):
                 history[-1][1] = new_history
