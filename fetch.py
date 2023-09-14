@@ -9,17 +9,13 @@ def fetch(url: str):
         if response.status_code == 200:
             
             soup = BeautifulSoup(response.text, "html.parser")
-            # 获取第二个p标签的内容
 
             p_tags = soup.find_all("p")
             extracted_text = p_tags[1].text
-            
-
             search_content = extracted_text.strip()
 
             question = f"Act as a summarizer. Please summarize {url}. The following is the content: {search_content}"
-            
-            print(question)
+
             return question
         
         else:
@@ -27,7 +23,3 @@ def fetch(url: str):
 
     except Exception as e:
         print(f"Error: {e}")
-
-
-if __name__ == "__main__":
-    fetch("https://dev.qweather.com/en/help")

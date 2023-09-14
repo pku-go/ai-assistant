@@ -9,7 +9,3 @@ def audio2text(file):
 
     response = requests.post(url=url, files=files)
     return response.json()['text']
-
-
-# if __name__ == "__main__":
-#     audio2text('sun-wukong.wav')

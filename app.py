@@ -8,7 +8,7 @@ from image_generate import *
 from stt import *
 from tts import *
 from pdf import *
-
+from function import *
 from mnist import *
 # Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
 
@@ -103,6 +103,13 @@ def add_file(history, file):
         new_message = {
             "role": "user",
             "content": generate_summary(current_file_text)
+        }
+        messages.append(new_message)
+    
+    else:
+        new_message = {
+            "role": "user",
+            "content": f"{file.name}"
         }
         messages.append(new_message)
     
@@ -202,6 +209,15 @@ def bot(history):
                 yield history
             if history[-1][1] == "":
                 print("history[-1][1] is null")
+            new_message = {
+                "role": "assistant",
+                "content": history[-1][1]
+            }
+            messages.append(new_message)
+        
+        else:
+            history[-1][1] = "Unsupported file type!"
+            yield history
             new_message = {
                 "role": "assistant",
                 "content": history[-1][1]

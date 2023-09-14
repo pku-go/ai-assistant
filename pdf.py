@@ -27,11 +27,3 @@ def generate_summary(current_file_text: str):
     summary_prompt = f"Act as a summarizer. Please summarize the following text: \n\n{current_file_text}"
 
     return summary_prompt
-
-
-if __name__ == "__main__":
-    with open("sample.txt", 'r', encoding="utf-8") as f:
-        current_file_text = f.read().replace('\n', ' ')
-    prompt = generate_answer(current_file_text, "Who is Tang Sanzang?")
-    print(prompt)
-    response = generate_text(prompt)

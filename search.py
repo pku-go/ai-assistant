@@ -23,8 +23,6 @@ def search(content: str):
             snippet = search_results["organic_results"][0]["snippet"]
 
             question = f"Please answer {content} based on the search result: {snippet}"
-            
-            print(question)
             return question
         
         else:
@@ -32,7 +30,3 @@ def search(content: str):
     
     except Exception as e:
         print(f"Error: {e}")
-
-
-if __name__ == "__main__":
-    search("Tsinghua University")

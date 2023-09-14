@@ -1,6 +1,3 @@
-
-# import argparse
-# import os
 import cv2
 import torch
 import numpy as np
@@ -41,6 +38,3 @@ def image_classification(file):
     result = label.item()
 
     return f"Classification result: {result}"
-
-if __name__ == "__main__":
-    print(image_classification("mnist.png"))
