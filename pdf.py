@@ -1,6 +1,3 @@
-import os
-import re
-
 import openai
 
 def generate_text(prompt):
@@ -33,7 +30,8 @@ def generate_summary(current_file_text: str):
 
 
 if __name__ == "__main__":
-    prompt = generate_answer("Hello", "Who is Sun Wukong?")
-    # print(prompt)
-    generate_text(prompt)
-    # print(generate_text(prompt))
+    with open("sample.txt", 'r', encoding="utf-8") as f:
+        current_file_text = f.read().replace('\n', ' ')
+    prompt = generate_answer(current_file_text, "Who is Tang Sanzang?")
+    print(prompt)
+    response = generate_text(prompt)

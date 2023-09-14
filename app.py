@@ -43,8 +43,7 @@ def add_text(history, text):
         content = text[6:]
         file_name = history[-2][0][0]
         with open(file_name, 'r', encoding="utf-8") as f:
-            current_file_text = f.read()
-            # current_file_text = f.read().replace('\n', ' ')
+            current_file_text = f.read().replace('\n', ' ')
         new_message = {
             "role": "user",
             "content": generate_answer(current_file_text, content)
@@ -75,8 +74,7 @@ def add_file(history, file):
         messages.append(new_message)
     elif file.name.endswith((".txt")):
         with open(file.name, 'r', encoding="utf-8") as f:
-            current_file_text = f.read()
-            # current_file_text = f.read().replace('\n', ' ')
+            current_file_text = f.read().replace('\n', ' ')
         new_message = {
             "role": "user",
             "content": generate_summary(current_file_text)
@@ -126,13 +124,6 @@ def bot(history):
             for new_history in get_textResponse(question):
                 history[-1][1] = new_history
                 yield history
-            # history[-1][1] = ""
-            # for chunk in generate_text(question):
-            #     try:
-            #         history[-1][1] += chunk['choices'][0]['text']
-            #         yield history
-            #     except KeyError:
-            #         pass
             new_message = {
                 "role": "assistant",
                 "content": history[-1][1]
@@ -172,13 +163,8 @@ def bot(history):
             for new_history in get_textResponse(summary_prompt):
                 history[-1][1] = new_history
                 yield history
-            # history[-1][1] = ""
-            # for chunk in generate_text(summary_prompt):
-            #     try:
-            #         history[-1][1] += chunk['choices'][0]['text']
-            #         yield history
-            #     except KeyError:
-            #         pass
+            if history[-1][1] == "":
+                print("history[-1][1] is null")
             new_message = {
                 "role": "assistant",
                 "content": history[-1][1]
