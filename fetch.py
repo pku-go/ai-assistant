@@ -9,9 +9,11 @@ def fetch(url: str):
         if response.status_code == 200:
             
             soup = BeautifulSoup(response.text, "html.parser")
+            # 获取第二个p标签的内容
 
             p_tags = soup.find_all("p")
-            extracted_text = ' '.join([p.get_text() for p in p_tags])
+            extracted_text = p_tags[1].text
+            
 
             search_content = extracted_text.strip()
 
