@@ -25,6 +25,15 @@ def get_chatResponse(messages):
         except KeyError:
             pass
 
+def get_textResponse(prompt):
+    response = generate_text(prompt)
+    results = ""
+    for chunk in response:
+        try:
+            results += chunk['choices'][0]['text']
+            yield results
+        except KeyError:
+            pass
 
 def add_text(history, text):
     history = history + [(text, None)]
@@ -49,9 +58,8 @@ def add_text(history, text):
     elif text.startswith("/file"):
         content = text[6:]
         file_name = history[-2][0][0]
-        print(file_name)
         with open(file_name, 'r', encoding="utf-8") as f:
-            current_file_text = f.read()
+            current_file_text = f.read().replace('\n', ' ')
         new_message = {
             "role": "user",
             "content": generate_answer(current_file_text, content)
@@ -82,7 +90,7 @@ def add_file(history, file):
         messages.append(new_message)
     elif file.name.endswith((".txt")):
         with open(file.name, 'r', encoding="utf-8") as f:
-            current_file_text = f.read()
+            current_file_text = f.read().replace('\n', ' ')
         new_message = {
             "role": "user",
             "content": generate_summary(current_file_text)
@@ -143,8 +151,15 @@ def bot(history):
             history[-1][1] = (path,)
             yield history
         elif history[-1][0].startswith(("/file")):
-            content = history[-1][0][6:]
-            pass
+            question = messages[-1]["content"]
+            for new_history in get_textResponse(question):
+                history[-1][1] = new_history
+                yield history
+            new_message = {
+                "role": "assistant",
+                "content": history[-1][1]
+            }
+            messages.append(new_message)
 
         elif history[-1][0].startswith(("/function")):
             pass
@@ -175,13 +190,12 @@ def bot(history):
             history[-1][1] = new_message['content']
             yield history
         elif history[-1][0][0].endswith((".txt")):
-            history[-1][1] = ""
-            for chunk in generate_text(messages[-1]['content']):
-                try:
-                    history[-1][1] += chunk['choices'][0]['text']
-                    yield history
-                except KeyError:
-                    pass
+            summary_prompt = messages[-1]['content']
+            for new_history in get_textResponse(summary_prompt):
+                history[-1][1] = new_history
+                yield history
+            if history[-1][1] == "":
+                print("history[-1][1] is null")
             new_message = {
                 "role": "assistant",
                 "content": history[-1][1]
