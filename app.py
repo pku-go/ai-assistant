@@ -107,7 +107,7 @@ def add_file(history, file):
     else:
         new_message = {
             "role": "user",
-            "content": f"{file.name}"
+            "content": ""
         }
         messages.append(new_message)
     
@@ -223,7 +223,7 @@ def bot(history):
             yield history
             new_message = {
                 "role": "assistant",
-                "content": history[-1][1]
+                "content": ""
             }
             messages.append(new_message)
 
