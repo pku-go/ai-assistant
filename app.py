@@ -15,6 +15,8 @@ from mnist import *
 messages = []
 current_file_text = None
 
+# get stream of chatbot responses
+
 
 def get_chatResponse(messages):
     response = chat(messages)
@@ -26,6 +28,9 @@ def get_chatResponse(messages):
         except KeyError:
             pass
 
+# get stream of chatbot responses
+
+
 def get_textResponse(prompt):
     response = generate_text(prompt)
     results = ""
@@ -36,9 +41,11 @@ def get_textResponse(prompt):
         except KeyError:
             yield results
 
+
 def add_text(history, text):
     history = history + [(text, None)]
 
+    # handle special commands
     if text.startswith("/search"):
         search_content = history[-1][0].replace("/search", "").strip()
         search_result = search(search_content)
@@ -47,7 +54,7 @@ def add_text(history, text):
             "content": search_result
         }
         messages.append(new_message)
-    
+
     elif text.startswith("/fetch"):
         fetch_url = history[-1][0].replace("/fetch", "").strip()
         fetch_result = fetch(fetch_url)
@@ -56,7 +63,7 @@ def add_text(history, text):
             "content": fetch_result
         }
         messages.append(new_message)
-    
+
     elif text.startswith("/file"):
         content = text[6:]
         file_name = history[-2][0][0]
@@ -67,34 +74,35 @@ def add_text(history, text):
             "content": generate_answer(current_file_text, content)
         }
         messages.append(new_message)
-    
+
     else:
         new_message = {
             "role": "user",
             "content": history[-1][0]
         }
         messages.append(new_message)
-    
+
     return history, gr.update(value="", interactive=False)
 
 
 def add_file(history, file):
     history = history + [((file.name,), None)]
 
+    # handle special files
     if file.name.endswith((".wav")):
         new_message = {
             "role": "user",
             "content": audio2text(file)
         }
         messages.append(new_message)
-    
+
     elif file.name.endswith((".png")):
         new_message = {
             "role": "user",
             "content": f"Please classify {file.name}"
         }
         messages.append(new_message)
-    
+
     elif file.name.endswith((".txt")):
         with open(file.name, 'r', encoding="utf-8") as f:
             current_file_text = f.read().replace('\n', ' ')
@@ -103,19 +111,21 @@ def add_file(history, file):
             "content": generate_summary(current_file_text)
         }
         messages.append(new_message)
-    
+
     else:
         new_message = {
             "role": "user",
             "content": ""
         }
         messages.append(new_message)
-    
+
     return history
 
 
 def bot(history):
+    # if message type is text
     if type(history[-1][0]) == str:
+        # handle special commands
         if history[-1][0].startswith(("/search")):
             for new_history in get_chatResponse(messages):
                 history[-1][1] = new_history
@@ -181,7 +191,8 @@ def bot(history):
                 "content": history[-1][1]
             }
             messages.append(new_message)
-            
+
+        # only chat
         else:
             for new_history in get_chatResponse(messages):
                 history[-1][1] = new_history
@@ -192,6 +203,7 @@ def bot(history):
             }
             messages.append(new_message)
 
+    # if message type is file, handle specific file type
     elif type(history[-1][0]) == tuple:
         if history[-1][0][0].endswith((".wav")):
             for new_history in get_chatResponse(messages):
@@ -217,7 +229,7 @@ def bot(history):
                 "content": history[-1][1]
             }
             messages.append(new_message)
-        
+
         else:
             history[-1][1] = "Unsupported file type!"
             yield history
