@@ -34,7 +34,7 @@ def get_textResponse(prompt):
             results += chunk['choices'][0]['text']
             yield results
         except KeyError:
-            pass
+            yield results
 
 def add_text(history, text):
     history = history + [(text, None)]
